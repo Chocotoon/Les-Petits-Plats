@@ -1,0 +1,207 @@
+body {
+    width: 1440px;
+    margin: auto;
+}
+
+/***************HEADER******************/
+header {
+    background: url("/assets/banner.png");
+    height: 667px;
+    position: relative;
+}
+
+.logo {
+    margin-top: 30px;
+    margin-left: 40px;
+}
+
+.tagline {
+    text-transform: uppercase;
+    color: #FFD15B;
+    font-family: "Anton";
+    font-size: 44px;
+    text-align: center;
+    width: 60%;
+    margin: auto;
+    margin-top: 12%;
+}
+
+#search_bar {
+    display: block;
+    margin: 20px auto;
+    width: 70%;
+    height: 60px;
+    border-radius: 11px;
+    padding-left: 20px;
+    font-family: "Manrope";
+    font-size: 16px;
+}
+
+#search_bar::placeholder {
+    color: #7A7A7A;
+}
+
+#search_btn {
+    background-color: black;
+    color: white;
+    position: absolute;
+    right: 230px;
+    bottom: 224px;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 11px;
+}
+
+
+#search_btn:hover {
+    background-color: #FFD15B;
+}
+
+#search_btn i {
+    font-size: 30px;
+}
+
+
+/**********************MAIN****************************/
+main {
+    background-color: #EDEDED;
+    padding: 20px 100px 0px;
+}
+
+
+/************************FILTRES SECTION********************************/
+#filtres {
+    display: flex;
+    justify-content: space-between;
+}
+
+#filtres button {
+    width: 170px;
+    height: 46px;
+    background-color: white;
+    border-radius: 11px;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 15px;
+    font-family: "Manrope";
+    font-size: 16px;
+}
+
+#filtres_btns {
+    display: flex;
+    justify-content: space-between;
+    width: 700px;
+}
+
+.nombre_recettes {
+    font-family: "Anton";
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 32px;
+}
+
+#btn_ingredients_list {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 10;
+    height: 315px;
+    overflow: scroll;
+    background-color: white;
+    top: 725px;
+    width: 170px;
+    border-bottom-left-radius: 11px;
+    border-bottom-right-radius: 11px;
+}
+
+#btn_ingredients_list[aria-expanded ="false"] {
+    display: none;
+}
+.filtre_ingredient {
+    margin: 5px 0px 0px 10px;
+    font-family: "Manrope";
+    font-size: 14px;
+}
+
+/**********************GALERIE SECTION***************************/
+#galerie {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.recipe_card {
+    width: 380px;
+    height: 730px;
+    border-radius: 21px;
+    background-color: white;
+    margin-top: 50px;
+    font-family: "Manrope";
+    font-size: 14px;
+    position: relative;
+}
+
+.recipe_card .recette_section,
+.recipe_card .ingredients_section,
+.recipe_card h2 {
+    padding: 10px 30px 0px 30px;
+}
+
+.recipe_card img {
+    width: 380px;
+    height: 250px;
+    object-fit: cover;
+    border-top-left-radius: 21px;
+    border-top-right-radius: 21px;
+}
+
+.recipe_card h2 {
+    font-family: "Anton";
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.recipe_card h3 {
+    text-transform: uppercase;
+    color: #7A7A7A;
+    font-size: 12px;
+}
+
+.recette_section {
+    height: 120px;
+    overflow: hidden;
+}
+
+.quantity {
+    color: #7A7A7A;
+}
+
+.ingredients_list {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    justify-content: space-between;
+    gap: 20px 20px;
+}
+
+.ingredient_bloc {
+    display: flex;
+    flex-direction: column;
+}
+
+.duree {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    background-color: #FFD15B;
+    display: flex;
+    width: 65px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 14px;
+    height: 25px;
+}
+

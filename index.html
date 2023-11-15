@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anton">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Manrope">
+    <script src="https://kit.fontawesome.com/3f8cf997bb.js" crossorigin="anonymous"></script>
+    <title>Les petits plats</title>
+</head>
+
+<body>
+    <header>
+        <img class="logo" src="/assets/Logo.png" alt="Logo du site Les petits plats">
+        <p class="tagline">cherchez parmi plus de 1500 recettes du quotidien, simples et délicieuses</p>
+        <input id="search_bar" type="text" name="search" placeholder="Recherchez une recette, un ingrédient, ...">
+        <button id="search_btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </header>
+
+</body>
+<main>
+    <section id="filtres">
+        <div id="filtres_btns">
+            <button id="btn_ingredients">Ingrédients<i class="fa-solid fa-chevron-down"></i></button>
+            <button id="btn_appliances">Appareils<i class="fa-solid fa-chevron-down"></i></button>
+            <button id="btn_ustensils">Ustensiles<i class="fa-solid fa-chevron-down"></i></button>
+        </div>
+        <div id="btn_ingredients_list" aria-expanded="false"></div>
+        <div></div>
+        <div></div>
+        <p class="nombre_recettes"></p>
+    </section>
+    <section id="galerie">
+
+    </section>
+    <script src="/scripts/templates/recipes.js"></script>
+    <script src="/scripts/script.js"></script>
+</main>
+
+</html>
