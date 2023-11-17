@@ -1,3 +1,5 @@
+/**********************************Template de création des fiches recettes************************************** */
+
 function createRecipeCard(data) {
     const { id, image, name, servings, ingredients, time, description, appliance, ustensils} = data;
 
