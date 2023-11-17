@@ -5,7 +5,7 @@ body {
 
 /***************HEADER******************/
 header {
-    background: url("/assets/banner.png");
+    background: url("assets/banner.png");
     height: 667px;
     position: relative;
 }
