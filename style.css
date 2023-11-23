@@ -117,6 +117,26 @@ main {
     border-bottom-right-radius: 11px;
 }
 
+.btn_item_list input {
+    border: 1px solid #C6C6C6;
+    width: 80%;
+    margin: auto;
+    min-height: 25px;
+    font-family: "Manrope";
+    padding: 0px 10px;
+}
+
+#btn_ingredients_list button,
+#btn_appliance_list button,
+#btn_ustensile_list button {
+    color: #C6C6C6;
+    position: absolute;
+    right: 15px;
+    top: 5px;
+    width: 5px;
+    height: fit-content;
+}
+
 #btn_ingredients_list[aria-expanded="false"],
 #btn_appliance_list[aria-expanded="false"],
 #btn_ustensile_list[aria-expanded="false"] {
