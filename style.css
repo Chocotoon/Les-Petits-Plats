@@ -108,7 +108,7 @@ main {
     flex-direction: column;
     position: absolute;
     z-index: 20;
-    height: 315px;
+    max-height: 315px;
     overflow: scroll;
     background-color: white;
     top: 725px;
@@ -148,7 +148,7 @@ main {
 }
 
 .tag {
-    margin: 5px 20px 0px 0px;
+    margin: 0px 20px 5px 0px;
     background-color: #FFD15B;
     height: 30px;
     width: 150px;
