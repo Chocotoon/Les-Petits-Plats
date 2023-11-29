@@ -16,6 +16,10 @@ const btnUstensilesIcon = document.querySelector("#btn_ustensils i");
 const ingredientInput = document.getElementById("ingredient_input");
 const ustensilInput = document.getElementById("ustensile_input");
 const applianceInput = document.getElementById("appliance_input");
+const valueIngredientClear = document.querySelector("#btn_ingredients .fa-xmark");
+const valueApplianceClear = document.querySelector("#btn_appliances .fa-xmark");
+const valueUstensilsClear = document.querySelector("#btn_ustensils .fa-xmark");
+
 
 /*******************************Tableaux***************************************** */
 
@@ -28,54 +32,67 @@ const activeFilters = [];
 
 /***************************EventListeners des filtres****************************************** */
 
-btnIngredient.addEventListener("click", () => {
-    if (listIngredientsFiltre.getAttribute("aria-expanded") === "false") {
-        listIngredientsFiltre.setAttribute("aria-expanded", "true");
-        btnIngredientIcon.classList.remove("fa-chevron-down");
-        btnIngredientIcon.classList.add("fa-chevron-up");
+function btnToggle(filtreList, btnIcon, btnClear, event) {
+    if (filtreList.getAttribute("aria-expanded") === "false") {
+        filtreList.setAttribute("aria-expanded", "true");
+        btnIcon.classList.remove("fa-chevron-down");
+        btnIcon.classList.add("fa-chevron-up");
     }
-    else if (listIngredientsFiltre.getAttribute("aria-expanded") === "true") {
-        listIngredientsFiltre.removeAttribute("aria-expanded");
-        listIngredientsFiltre.setAttribute("aria-expanded", "false");
-        btnIngredientIcon.classList.remove("fa-chevron-up");
-        btnIngredientIcon.classList.add("fa-chevron-down");
+    else if (filtreList.getAttribute("aria-expanded") === "true" && event.target != btnClear) {
+        filtreList.removeAttribute("aria-expanded");
+        filtreList.setAttribute("aria-expanded", "false");
+        btnIcon.classList.remove("fa-chevron-up");
+        btnIcon.classList.add("fa-chevron-down");
+        btnClear.style.display = "none";
     }
+}
+btnIngredient.addEventListener("click", function (event) {
+    btnToggle(listIngredientsFiltre, btnIngredientIcon, valueIngredientClear, event);
 })
 
-btnAppliance.addEventListener("click", () => {
-
-    if (listApplianceFiltre.getAttribute("aria-expanded") === "false") {
-        listApplianceFiltre.setAttribute("aria-expanded", "true");
-        btnApplianceIcon.classList.remove("fa-chevron-down");
-        btnApplianceIcon.classList.add("fa-chevron-up");
-    }
-    else if (listApplianceFiltre.getAttribute("aria-expanded") === "true") {
-        listApplianceFiltre.removeAttribute("aria-expanded");
-        listApplianceFiltre.setAttribute("aria-expanded", "false");
-        btnApplianceIcon.classList.remove("fa-chevron-up");
-        btnApplianceIcon.classList.add("fa-chevron-down");
-
-    }
+btnAppliance.addEventListener("click", function (event) {
+    btnToggle(listApplianceFiltre, btnApplianceIcon, valueApplianceClear, event);
 })
 
-btnUstensiles.addEventListener("click", () => {
-
-    if (listUstensileFiltre.getAttribute("aria-expanded") === "false") {
-        listUstensileFiltre.setAttribute("aria-expanded", "true");
-        btnUstensilesIcon.classList.remove("fa-chevron-down");
-        btnUstensilesIcon.classList.add("fa-chevron-up");
-    }
-
-    else if (listUstensileFiltre.getAttribute("aria-expanded") === "true") {
-        listUstensileFiltre.removeAttribute("aria-expanded");
-        listUstensileFiltre.setAttribute("aria-expanded", "false");
-        btnUstensilesIcon.classList.remove("fa-chevron-up");
-        btnUstensilesIcon.classList.add("fa-chevron-down");
-
-    }
+btnUstensiles.addEventListener("click", function (event) {
+    btnToggle(listUstensileFiltre, btnUstensilesIcon, valueUstensilsClear, event);
 })
 
-/***************************************************************************************** */
+function updateFiltreIcon() {
+    const filtreContainerChevrons = document.querySelectorAll(".fa-solid");
+    filtreContainerChevrons.forEach(filtreContainerChevron => {
+        if (filtreContainerChevron.classList.contains("fa-chevron-up")) {
+            filtreContainerChevron.classList.remove("fa-chevron-up");
+            filtreContainerChevron.classList.add("fa-chevron-down");
+        }
+    })
+}
+/**********************************Fonctions de création des filtres******************************************************* */
+
+function constructIngredientList(ingredient) {
+    const filtreIngredient = document.createElement("span");
+    filtreIngredient.innerText = `${ingredient}`;
+    filtreIngredient.classList.add("filtre_list_item");
+    filtreIngredient.setAttribute("data-value", `${ingredient}`);
+    listIngredientsFiltre.appendChild(filtreIngredient);
+
+}
+
+function constructApplianceList(appliance) {
+    const filtreAppliance = document.createElement("span");
+    filtreAppliance.innerText = `${appliance}`;
+    filtreAppliance.classList.add("filtre_list_item");
+    filtreAppliance.setAttribute("data-value", `${appliance}`);
+    listApplianceFiltre.appendChild(filtreAppliance);
+}
+
+function constructUstensileList(ustensile) {
+    const filtreUstensile = document.createElement("span");
+    filtreUstensile.innerText = `${ustensile}`;
+    filtreUstensile.classList.add("filtre_list_item");
+    filtreUstensile.setAttribute("data-value", `${ustensile}`);
+    listUstensileFiltre.appendChild(filtreUstensile);
+}
 
 let nbeRecettes = 0;
 
@@ -86,6 +103,252 @@ async function getRecipeData() {
     return recipes;
 }
 
+function advancedFilter(clearBtn, inputELEMENT, inputValue) {
+    clearBtn.style.display = "block";
+    inputValue = inputELEMENT.value;
+    let value;
+    Array.from(filtreSectionDOM.children).forEach(element => {
+        value = element.getAttribute("data-value");
+        activeFilters.push(value);
+    })
+    if (inputValue.length > 2) {
+
+        const filteredRecipes = recipeArray.filter(recipe =>
+            activeFilters.every(filterValue =>
+                recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
+                recipe.ustensils.some(ustensil => ustensil === filterValue) ||
+                recipe.appliance === filterValue
+            ));
+        const filtreListsitems = document.querySelectorAll(".btn_item_list span");
+        filtreListsitems.forEach(item => {
+            item.remove();
+        })
+
+        ingredientSet.clear()
+        applianceSet.clear()
+        ustensileSet.clear()
+
+        filteredRecipes.forEach(filteredRecipe => {
+            filteredRecipe.ingredients.forEach(ingredient => {
+                if (ingredient.ingredient.toLowerCase().includes(inputValue)) {
+                    ingredientSet.add(ingredient.ingredient);
+                }
+            });
+
+            recipeArray.forEach(recipe => {
+                recipe.ustensils.forEach(ustensil =>
+                    ustensileSet.add(ustensil));
+            });
+            recipeArray.forEach(recipe => {
+                applianceSet.add(recipe.appliance);
+            })
+        })
+
+        if (filtreSectionDOM.children.length >= 1) {
+            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
+            filtreListsitems.forEach(item => {
+                item.remove();
+            })
+
+            ingredientSet.clear()
+            applianceSet.clear()
+            ustensileSet.clear()
+        }
+        filteredRecipes.forEach(filteredRecipe => {
+            filteredRecipe.ingredients.forEach(ingredient => {
+                if (ingredient.ingredient.toLowerCase().includes(inputValue)
+                    && !ingredientSet.has(ingredient.ingredient)) {
+                    ingredientSet.add(ingredient.ingredient);
+                }
+            });
+
+            filteredRecipe.ustensils.forEach(ustensil =>
+                ustensileSet.add(ustensil));
+
+            applianceSet.add(filteredRecipe.appliance);
+        }
+        );
+
+        ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+        applianceSet.forEach(appliance => constructApplianceList(appliance));
+        ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+    }
+    else if (inputValue.length < 3 && inputValue.length > 0) {
+        if (filtreSectionDOM.children.length >= 1) {
+            inputValue = "";
+            Array.from(filtreSectionDOM.children).forEach(element => {
+                value = element.getAttribute("data-value");
+                activeFilters.push(value);
+            })
+            const filteredRecipes = recipeArray.filter(recipe =>
+                activeFilters.every(filterValue =>
+                    recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
+                    recipe.ustensils.some(ustensil => ustensil === filterValue) ||
+                    recipe.appliance === filterValue
+                ));
+            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
+            filtreListsitems.forEach(item => {
+                item.remove();
+            })
+
+            ingredientSet.clear()
+            applianceSet.clear()
+            ustensileSet.clear()
+
+            filteredRecipes.forEach(filteredRecipe => {
+                filteredRecipe.ingredients.forEach(ingredient => {
+                    activeFilters.forEach(activeFilter => {
+
+                        if (ingredient.ingredient.toLowerCase().includes(activeFilter)) {
+                            ingredientSet.add(ingredient.ingredient);
+                        }
+                    })
+                });
+
+                filteredRecipes.forEach(recipe => {
+                    recipe.ustensils.forEach(ustensil =>
+                        ustensileSet.add(ustensil));
+                });
+                filteredRecipes.forEach(recipe => {
+                    applianceSet.add(recipe.appliance);
+                })
+            })
+            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+            applianceSet.forEach(appliance => constructApplianceList(appliance));
+            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+        }
+        else if (filtreSectionDOM.children.length === 0) {
+            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
+            filtreListsitems.forEach(item => {
+                item.remove();
+            })
+            ingredientSet.clear()
+            applianceSet.clear()
+            ustensileSet.clear()
+            recipeArray.forEach(recipeData => {
+                recipeData.ingredients.forEach(ingredient => {
+                    ingredientSet.add(ingredient.ingredient);
+                });
+                recipeData.ustensils.forEach(ustensil => {
+                    ustensileSet.add(ustensil);
+                });
+                applianceSet.add(recipeData.appliance);
+            });
+            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+            applianceSet.forEach(appliance => constructApplianceList(appliance));
+            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+
+        }
+    }
+
+    else if (inputValue.length === 0) {
+        clearBtn.style.display = "none";
+        if (filtreSectionDOM.children.length >= 1) {
+            inputELEMENT.value = "";
+            inputValue = "";
+            activeFilters.length = 0;
+            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
+            filtreListsitems.forEach(item => {
+                item.remove();
+            })
+            ingredientSet.clear()
+            applianceSet.clear()
+            ustensileSet.clear()
+
+            Array.from(filtreSectionDOM.children).forEach(element => {
+                const value = element.getAttribute("data-value");
+                activeFilters.push(value);
+            })
+
+            const filteredRecipes = recipeArray.filter(recipe =>
+                recipe.ingredients.some(ingredient =>
+                    activeFilters.includes(ingredient.ingredient)
+                ) ||
+                recipe.ustensils.some(ustensil =>
+                    activeFilters.includes(ustensil)
+                ) ||
+                activeFilters.includes(recipe.appliance));
+            filteredRecipeArray.length = 0;
+            filteredRecipeArray.push(...filteredRecipes);
+
+            filteredRecipeArray.forEach(filteredRecipe => {
+                filteredRecipe.ingredients.forEach(ingredient => {
+                    ingredientSet.add(ingredient.ingredient);
+                });
+                filteredRecipe.ustensils.forEach(ustensil => {
+                    ustensileSet.add(ustensil);
+                });
+                applianceSet.add(filteredRecipe.appliance);
+
+            });
+            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+            applianceSet.forEach(appliance => constructApplianceList(appliance));
+            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+        }
+    }
+    clearBtn.addEventListener("click", () => {
+        inputELEMENT.value = "";
+        inputValue = "";
+        clearBtn.style.display = "none";
+        activeFilters.length = 0;
+        const filtreListsitems = document.querySelectorAll(".btn_item_list span");
+        filtreListsitems.forEach(item => {
+            item.remove();
+        })
+        ingredientSet.clear()
+        applianceSet.clear()
+        ustensileSet.clear()
+        if (filtreSectionDOM.children.length === 0) {
+            recipeArray.forEach(filteredRecipe => {
+
+                filteredRecipe.ingredients.forEach(ingredient => {
+                    ingredientSet.add(ingredient.ingredient);
+                });
+                filteredRecipe.ustensils.forEach(ustensil => {
+                    ustensileSet.add(ustensil);
+                });
+
+                applianceSet.add(filteredRecipe.appliance);
+            })
+            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+            applianceSet.forEach(appliance => constructApplianceList(appliance));
+            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+
+        }
+        if (filtreSectionDOM.children.length >= 1) {
+            Array.from(filtreSectionDOM.children).forEach(element => {
+                const value = element.getAttribute("data-value");
+                activeFilters.push(value);
+            })
+
+            const filteredRecipes = recipeArray.filter(recipe =>
+                recipe.ingredients.some(ingredient =>
+                    activeFilters.includes(ingredient.ingredient)
+                ) ||
+                recipe.ustensils.some(ustensil =>
+                    activeFilters.includes(ustensil)
+                ) ||
+                activeFilters.includes(recipe.appliance));
+            filteredRecipeArray.length = 0;
+            filteredRecipeArray.push(...filteredRecipes);
+
+            filteredRecipeArray.forEach(filteredRecipe => {
+                filteredRecipe.ingredients.forEach(ingredient => {
+                    ingredientSet.add(ingredient.ingredient);
+                });
+                filteredRecipe.ustensils.forEach(ustensil => {
+                    ustensileSet.add(ustensil);
+                });
+                applianceSet.add(filteredRecipe.appliance);
+
+            });
+            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+            applianceSet.forEach(appliance => constructApplianceList(appliance));
+            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+        }
+
+    })
+}
 
 getRecipeData().then(recipes => {
 
@@ -95,7 +358,6 @@ getRecipeData().then(recipes => {
         const recipe = createRecipeCard(recipeData);
         const recipeCard = recipe.createRecipeDOM();
         galerie.appendChild(recipeCard);
-        nbeRecettes += 1;
         recipeArray.push(recipeData)
         recipeData.ingredients.forEach(ingredient => {
             ingredientSet.add(ingredient.ingredient);
@@ -105,35 +367,14 @@ getRecipeData().then(recipes => {
         });
         applianceSet.add(recipeData.appliance);
     });
-
+    nbeRecettes = recipes.length;
     totalRecipe.innerText = `${nbeRecettes} recettes`;
 
     /*********************************Création des listes de filtres*********************************************************** */
 
-    ingredientSet.forEach(ingredient => {
-        const filtreIngredient = document.createElement("span");
-        filtreIngredient.innerText = `${ingredient}`;
-        filtreIngredient.classList.add("filtre_list_item");
-        filtreIngredient.setAttribute("data-value", `${ingredient}`);
-        listIngredientsFiltre.appendChild(filtreIngredient);
-    });
-
-    applianceSet.forEach(appliance => {
-        const filtreAppliance = document.createElement("span");
-        filtreAppliance.innerText = `${appliance}`;
-        filtreAppliance.classList.add("filtre_list_item");
-        filtreAppliance.setAttribute("data-value", `${appliance}`);
-        listApplianceFiltre.appendChild(filtreAppliance);
-    });
-
-    ustensileSet.forEach(ustensile => {
-        const filtreUstensile = document.createElement("span");
-        filtreUstensile.innerText = `${ustensile}`;
-        filtreUstensile.classList.add("filtre_list_item");
-        filtreUstensile.setAttribute("data-value", `${ustensile}`);
-        listUstensileFiltre.appendChild(filtreUstensile);
-    });
-
+    ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+    applianceSet.forEach(appliance => constructApplianceList(appliance));
+    ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
 
 
     /*************************************Création des tags**************************************** */
@@ -152,27 +393,32 @@ getRecipeData().then(recipes => {
                 ustensilInput.value = "";
                 applianceInput.value = "";
                 filtreContainer.setAttribute("aria-expanded", "false");
-
+                updateFiltreIcon();
+                valueIngredientClear.style.display = "none";
+                valueApplianceClear.style.display = "none";
+                valueUstensilsClear.style.display = "none";
 
                 /*******************************Gestion des filtres par tag******************************************* */
 
                 if (filtreSectionDOM.children.length === 1) {
+                    Array.from(filtreSectionDOM.children).forEach(element => {
+                        const value = element.getAttribute("data-value");
+                        activeFilters.push(value);
+                    })
                     const filteredRecipes = recipeArray.filter(recipe =>
                         recipe.ingredients.some(ingredient =>
                             ingredient.ingredient === value) ||
                         recipe.ustensils.some(ustensil => ustensil === value) ||
                         recipe.appliance === value);
                     filteredRecipeArray.push(...filteredRecipes);
-
                     filteredRecipeArray.forEach(filteredRecipe => {
                         tagArray.add(filteredRecipe);
                     });
-                    nbeRecettes = 0;
-                    galerie.innerHTML = "";
+
                 }
 
                 else if (filtreSectionDOM.children.length > 1) {
-
+                    activeFilters.length = 0
                     Array.from(filtreSectionDOM.children).forEach(element => {
                         const value = element.getAttribute("data-value");
                         activeFilters.push(value);
@@ -205,48 +451,32 @@ getRecipeData().then(recipes => {
                 applianceSet.clear()
                 ustensileSet.clear()
 
-
                 filteredRecipeArray.forEach(filteredRecipe => {
                     const recipe = createRecipeCard(filteredRecipe);
                     const recipeCard = recipe.createRecipeDOM();
                     galerie.appendChild(recipeCard);
-                    nbeRecettes += 1;
-                    totalRecipe.innerText = `${nbeRecettes} recettes`;
-                    filteredRecipe.ingredients.forEach(ingredient => {
-                        ingredientSet.add(ingredient.ingredient);
-                    });
 
+                    filteredRecipe.ingredients.forEach(ingredient => {
+                        if (!activeFilters.some(activeFilter => activeFilter === ingredient.ingredient)) {
+                            ingredientSet.add(ingredient.ingredient);
+                        }
+                    });
                     filteredRecipe.ustensils.forEach(ustensil => {
-                        ustensileSet.add(ustensil);
+                        if (!activeFilters.some(activeFilter => activeFilter === ustensil)) {
+                            ustensileSet.add(ustensil);
+                        }
                     });
                     ;
-                    applianceSet.add(filteredRecipe.appliance);
-
+                    if (!activeFilters.some(activeFilter => activeFilter === filteredRecipe.appliance)) {
+                        applianceSet.add(filteredRecipe.appliance);
+                    }
                 })
-
-                ingredientSet.forEach(ingredient => {
-                    const filtreIngredient = document.createElement("span");
-                    filtreIngredient.innerText = `${ingredient}`;
-                    filtreIngredient.classList.add("filtre_list_item");
-                    filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                    listIngredientsFiltre.appendChild(filtreIngredient);
-                });
-
-                applianceSet.forEach(appliance => {
-                    const filtreAppliance = document.createElement("span");
-                    filtreAppliance.innerText = `${appliance}`;
-                    filtreAppliance.classList.add("filtre_list_item");
-                    filtreAppliance.setAttribute("data-value", `${appliance}`);
-                    listApplianceFiltre.appendChild(filtreAppliance);
-                });
-
-                ustensileSet.forEach(ustensile => {
-                    const filtreUstensile = document.createElement("span");
-                    filtreUstensile.innerText = `${ustensile}`;
-                    filtreUstensile.classList.add("filtre_list_item");
-                    filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                    listUstensileFiltre.appendChild(filtreUstensile);
-                });
+                console.log(filteredRecipeArray.length)
+                nbeRecettes = filteredRecipeArray.length;
+                totalRecipe.innerText = `${nbeRecettes} recettes`;
+                ingredientSet.forEach(ingredient => constructIngredientList(ingredient))
+                applianceSet.forEach(appliance => constructApplianceList(appliance));
+                ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
 
                 /**************************************Suppression des tags*************************************************** */
 
@@ -254,101 +484,79 @@ getRecipeData().then(recipes => {
                 filtreSectionDOM.addEventListener("click", () => {
                     const target = event.target;
                     if (target.classList.contains("fa-xmark")) {
+                        target.parentElement.remove();
                         const filtreListsitems = document.querySelectorAll(".btn_item_list span");
                         filtreListsitems.forEach(item => {
                             item.remove();
                         })
+
                         ingredientSet.clear()
                         applianceSet.clear()
                         ustensileSet.clear()
 
-                        tagArray.forEach(filteredRecipe => {
-                            filteredRecipe.ingredients.forEach(ingredient => {
-                                ingredientSet.add(ingredient.ingredient);
+                        if (filtreSectionDOM.children.length >= 1) {
+                            tagArray.forEach(filteredRecipe => {
+                                filteredRecipe.ingredients.forEach(ingredient => {
+                                    ingredientSet.add(ingredient.ingredient);
+                                });
+
+                                filteredRecipe.ustensils.forEach(ustensil => {
+                                    ustensileSet.add(ustensil);
+                                });
+                                ;
+                                applianceSet.add(filteredRecipe.appliance);
+
+                            })
+
+                            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+                            applianceSet.forEach(appliance => constructApplianceList(appliance));
+                            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
+
+                            const tagArrayAsArray = Array.from(tagArray);
+                            const filteredTagArray = tagArrayAsArray.filter(recipe =>
+                                activeFilters.every(filterValue =>
+                                    recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
+                                    recipe.ustensils.some(ustensil => ustensil === filterValue) ||
+                                    recipe.appliance === filterValue
+                                ));
+                            filteredTagArray.forEach(filteredRecipe => {
+                                tagArray.add(filteredRecipe);
                             });
+                            galerie.innerHTML = "";
+                            nbeRecettes = 0;
+                            activeFilters.length = 0;
 
-                            filteredRecipe.ustensils.forEach(ustensil => {
-                                ustensileSet.add(ustensil);
-                            });
-                            ;
-                            applianceSet.add(filteredRecipe.appliance);
+                            Array.from(filtreSectionDOM.children).forEach(element => {
+                                const value = element.getAttribute("data-value");
+                                activeFilters.push(value);
+                            })
 
-                        })
+                            const filteredRecipes = recipeArray.filter(recipe =>
+                                activeFilters.every(filterValue =>
+                                    recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
+                                    recipe.ustensils.some(ustensil => ustensil === filterValue) ||
+                                    recipe.appliance === filterValue
+                                ));
 
-                        ingredientSet.forEach(ingredient => {
-                            const filtreIngredient = document.createElement("span");
-                            filtreIngredient.innerText = `${ingredient}`;
-                            filtreIngredient.classList.add("filtre_list_item");
-                            filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                            listIngredientsFiltre.appendChild(filtreIngredient);
-                        });
+                            filteredRecipeArray.length = 0;
 
-                        applianceSet.forEach(appliance => {
-                            const filtreAppliance = document.createElement("span");
-                            filtreAppliance.innerText = `${appliance}`;
-                            filtreAppliance.classList.add("filtre_list_item");
-                            filtreAppliance.setAttribute("data-value", `${appliance}`);
-                            listApplianceFiltre.appendChild(filtreAppliance);
-                        });
+                            filteredRecipeArray.push(...filteredRecipes);
 
-                        ustensileSet.forEach(ustensile => {
-                            const filtreUstensile = document.createElement("span");
-                            filtreUstensile.innerText = `${ustensile}`;
-                            filtreUstensile.classList.add("filtre_list_item");
-                            filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                            listUstensileFiltre.appendChild(filtreUstensile);
-                        });
-
-                        const tagArrayAsArray = Array.from(tagArray);
-                        const filteredTagArray = tagArrayAsArray.filter(recipe =>
-                            activeFilters.every(filterValue =>
-                                recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
-                                recipe.ustensils.some(ustensil => ustensil === filterValue) ||
-                                recipe.appliance === filterValue
-                            ));
-                        filteredTagArray.forEach(filteredRecipe => {
-                            tagArray.add(filteredRecipe);
-                        });
-                        galerie.innerHTML = "";
-                        nbeRecettes = 0;
-                        target.parentElement.remove();
-                        activeFilters.length = 0;
-
-                        Array.from(filtreSectionDOM.children).forEach(element => {
-                            const value = element.getAttribute("data-value");
-                            activeFilters.push(value);
-                        })
-
-                        const filteredRecipes = recipeArray.filter(recipe =>
-                            activeFilters.every(filterValue =>
-                                recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
-                                recipe.ustensils.some(ustensil => ustensil === filterValue) ||
-                                recipe.appliance === filterValue
-                            ));
-
-                        filteredRecipeArray.length = 0;
-
-                        filteredRecipeArray.push(...filteredRecipes);
-
-                        filteredRecipeArray.forEach(filteredRecipe => {
-                            const recipe = createRecipeCard(filteredRecipe);
-                            const recipeCard = recipe.createRecipeDOM();
-                            galerie.appendChild(recipeCard);
-                            nbeRecettes += 1;
+                            filteredRecipeArray.forEach(filteredRecipe => {
+                                const recipe = createRecipeCard(filteredRecipe);
+                                const recipeCard = recipe.createRecipeDOM();
+                                galerie.appendChild(recipeCard);
+                            })
+                            nbeRecettes = filteredRecipeArray.length;
                             totalRecipe.innerText = `${nbeRecettes} recettes`;
-                        })
-
-                        totalRecipe.innerText = `${nbeRecettes} recettes`;
+                        }
                         if (filtreSectionDOM.children.length === 0) {
 
                             galerie.innerHTML = "";
                             nbeRecettes = 0;
                             filteredRecipeArray.length = 0;
                             activeFilters.length = 0;
-                            tagArray.clear();
-                            ingredientSet.clear();
-                            applianceSet.clear();
-                            ustensileSet.clear();
+
                             recipeArray.forEach(filteredRecipe => {
 
                                 filteredRecipe.ingredients.forEach(ingredient => {
@@ -362,32 +570,13 @@ getRecipeData().then(recipes => {
                                 const recipe = createRecipeCard(filteredRecipe);
                                 const recipeCard = recipe.createRecipeDOM();
                                 galerie.appendChild(recipeCard);
-                                nbeRecettes += 1;
+                                nbeRecettes = recipeArray.length;
+                                totalRecipe.innerText = `${nbeRecettes} recettes`;
 
                             })
-                            ingredientSet.forEach(ingredient => {
-                                const filtreIngredient = document.createElement("span");
-                                filtreIngredient.innerText = `${ingredient}`;
-                                filtreIngredient.classList.add("filtre_list_item");
-                                filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                                listIngredientsFiltre.appendChild(filtreIngredient);
-                            });
-
-                            applianceSet.forEach(appliance => {
-                                const filtreAppliance = document.createElement("span");
-                                filtreAppliance.innerText = `${appliance}`;
-                                filtreAppliance.classList.add("filtre_list_item");
-                                filtreAppliance.setAttribute("data-value", `${appliance}`);
-                                listApplianceFiltre.appendChild(filtreAppliance);
-                            });
-
-                            ustensileSet.forEach(ustensile => {
-                                const filtreUstensile = document.createElement("span");
-                                filtreUstensile.innerText = `${ustensile}`;
-                                filtreUstensile.classList.add("filtre_list_item");
-                                filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                                listUstensileFiltre.appendChild(filtreUstensile);
-                            });
+                            ingredientSet.forEach(ingredient => constructIngredientList(ingredient));
+                            applianceSet.forEach(appliance => constructApplianceList(appliance));
+                            ustensileSet.forEach(ustensile => constructUstensileList(ustensile));
                         }
                     }
                 })
@@ -397,450 +586,13 @@ getRecipeData().then(recipes => {
     /**********************Champs de recherche Avancée Ingrédients *************************************************** */
 
     ingredientInput.addEventListener("input", () => {
-
-        let ingredientValueInput = ingredientInput.value;
-        if (ingredientValueInput.length > 2) {
-
-            const filteredRecipes = recipeArray.filter(recipe =>
-                recipe.ingredients.some(ingredient =>
-                    ingredient.ingredient.toLowerCase().includes(ingredientValueInput)))
-
-            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
-            filtreListsitems.forEach(item => {
-                item.remove();
-            })
-            ingredientSet.clear()
-            applianceSet.clear()
-            ustensileSet.clear()
-
-            filteredRecipes.forEach(filteredRecipe => {
-                filteredRecipe.ingredients.forEach(ingredient => {
-                    if (ingredient.ingredient.toLowerCase().includes(ingredientValueInput)) {
-                        ingredientSet.add(ingredient.ingredient);
-                    }
-                });
-
-                filteredRecipe.ustensils.forEach(ustensil => {
-                    ustensileSet.add(ustensil);
-                });
-                ;
-                applianceSet.add(filteredRecipe.appliance);
-
-            })
-            ingredientSet.forEach(ingredient => {
-                const filtreIngredient = document.createElement("span");
-                filtreIngredient.innerText = `${ingredient}`;
-                filtreIngredient.classList.add("filtre_list_item");
-                filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                listIngredientsFiltre.appendChild(filtreIngredient);
-            });
-
-            applianceSet.forEach(appliance => {
-                const filtreAppliance = document.createElement("span");
-                filtreAppliance.innerText = `${appliance}`;
-                filtreAppliance.classList.add("filtre_list_item");
-                filtreAppliance.setAttribute("data-value", `${appliance}`);
-                listApplianceFiltre.appendChild(filtreAppliance);
-            });
-
-            ustensileSet.forEach(ustensile => {
-                const filtreUstensile = document.createElement("span");
-                filtreUstensile.innerText = `${ustensile}`;
-                filtreUstensile.classList.add("filtre_list_item");
-                filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                listUstensileFiltre.appendChild(filtreUstensile);
-            });
-
-            /*******************************Gestion des filtres par tag******************************************* */
-
-            if (filtreSectionDOM.children.length === 1) {
-                const filteredRecipes = recipeArray.filter(recipe =>
-                    recipe.ingredients.some(ingredient =>
-                        ingredient.ingredient === value) ||
-                    recipe.ustensils.some(ustensil => ustensil === value) ||
-                    recipe.appliance === value);
-                filteredRecipeArray.push(...filteredRecipes);
-
-                filteredRecipeArray.forEach(filteredRecipe => {
-                    tagArray.add(filteredRecipe);
-                });
-                nbeRecettes = 0;
-                galerie.innerHTML = "";
-            }
-
-            else if (filtreSectionDOM.children.length > 1) {
-
-                Array.from(filtreSectionDOM.children).forEach(element => {
-                    const value = element.getAttribute("data-value");
-                    activeFilters.push(value);
-                })
-
-                const filteredRecipes = recipeArray.filter(recipe =>
-                    activeFilters.every(filterValue =>
-                        recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
-                        recipe.ustensils.some(ustensil => ustensil === filterValue) ||
-                        recipe.appliance === filterValue
-                    ));
-                filteredRecipeArray.length = 0;
-
-                filteredRecipeArray.push(...filteredRecipes);
-
-                filteredRecipeArray.forEach(filteredRecipe => {
-                    tagArray.add(filteredRecipe);
-                });
-            }
-        }
-
-        else if (ingredientValueInput.length < 3) {
-
-
-            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
-            filtreListsitems.forEach(item => {
-                item.remove();
-            })
-            ingredientSet.clear()
-            applianceSet.clear()
-            ustensileSet.clear()
-
-            recipeArray.forEach(recipe => {
-                recipe.ingredients.forEach(ingredient => {
-
-                    ingredientSet.add(ingredient.ingredient);
-
-                });
-
-                recipe.ustensils.forEach(ustensil => {
-                    ustensileSet.add(ustensil);
-                });
-                ;
-                applianceSet.add(recipe.appliance);
-
-            })
-            ingredientSet.forEach(ingredient => {
-                const filtreIngredient = document.createElement("span");
-                filtreIngredient.innerText = `${ingredient}`;
-                filtreIngredient.classList.add("filtre_list_item");
-                filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                listIngredientsFiltre.appendChild(filtreIngredient);
-            });
-
-            applianceSet.forEach(appliance => {
-                const filtreAppliance = document.createElement("span");
-                filtreAppliance.innerText = `${appliance}`;
-                filtreAppliance.classList.add("filtre_list_item");
-                filtreAppliance.setAttribute("data-value", `${appliance}`);
-                listApplianceFiltre.appendChild(filtreAppliance);
-            });
-
-            ustensileSet.forEach(ustensile => {
-                const filtreUstensile = document.createElement("span");
-                filtreUstensile.innerText = `${ustensile}`;
-                filtreUstensile.classList.add("filtre_list_item");
-                filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                listUstensileFiltre.appendChild(filtreUstensile);
-            });
-        }
-    }
-    )
-
-    /**********************Champs de recherche Avancée Ustensiles *************************************************** */
-
+        advancedFilter(valueIngredientClear, ingredientInput)
+    })
+    applianceInput.addEventListener("input", () => {
+        advancedFilter(valueApplianceClear, applianceInput)
+    })
     ustensilInput.addEventListener("input", () => {
-
-        let ustensileValueInput = ustensilInput.value;
-        if (applianceValueInput.length > 2) {
-            const filteredRecipes = recipeArray.filter(recipe =>
-                recipe.ustensils.some(ustensil =>
-                    ustensil.toLowerCase().includes(ustensileValueInput)))
-
-            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
-            filtreListsitems.forEach(item => {
-                item.remove();
-            })
-            ingredientSet.clear()
-            applianceSet.clear()
-            ustensileSet.clear()
-
-            filteredRecipes.forEach(filteredRecipe => {
-                filteredRecipe.ingredients.forEach(ingredient => {
-                    
-                        ingredientSet.add(ingredient.ingredient);
-                    
-                });
-
-                filteredRecipe.ustensils.forEach(ustensil => {
-                    if (ustensil.toLowerCase().includes(ustensileValueInput)) {
-                    ustensileSet.add(ustensil);
-                    }
-                });
-                ;
-                applianceSet.add(filteredRecipe.appliance);
-
-            })
-            ingredientSet.forEach(ingredient => {
-                const filtreIngredient = document.createElement("span");
-                filtreIngredient.innerText = `${ingredient}`;
-                filtreIngredient.classList.add("filtre_list_item");
-                filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                listIngredientsFiltre.appendChild(filtreIngredient);
-            });
-
-            applianceSet.forEach(appliance => {
-                const filtreAppliance = document.createElement("span");
-                filtreAppliance.innerText = `${appliance}`;
-                filtreAppliance.classList.add("filtre_list_item");
-                filtreAppliance.setAttribute("data-value", `${appliance}`);
-                listApplianceFiltre.appendChild(filtreAppliance);
-            });
-
-            ustensileSet.forEach(ustensile => {
-                const filtreUstensile = document.createElement("span");
-                filtreUstensile.innerText = `${ustensile}`;
-                filtreUstensile.classList.add("filtre_list_item");
-                filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                listUstensileFiltre.appendChild(filtreUstensile);
-            });
-
-            /*******************************Gestion des filtres par tag******************************************* */
-
-            if (filtreSectionDOM.children.length === 1) {
-                const filteredRecipes = recipeArray.filter(recipe =>
-                    recipe.ingredients.some(ingredient =>
-                        ingredient.ingredient === value) ||
-                    recipe.ustensils.some(ustensil => ustensil === value) ||
-                    recipe.appliance === value);
-                filteredRecipeArray.push(...filteredRecipes);
-
-                filteredRecipeArray.forEach(filteredRecipe => {
-                    tagArray.add(filteredRecipe);
-                });
-                nbeRecettes = 0;
-                galerie.innerHTML = "";
-            }
-
-            else if (filtreSectionDOM.children.length > 1) {
-
-                Array.from(filtreSectionDOM.children).forEach(element => {
-                    const value = element.getAttribute("data-value");
-                    activeFilters.push(value);
-                })
-
-                const filteredRecipes = recipeArray.filter(recipe =>
-                    activeFilters.every(filterValue =>
-                        recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
-                        recipe.ustensils.some(ustensil => ustensil === filterValue) ||
-                        recipe.appliance === filterValue
-                    ));
-                filteredRecipeArray.length = 0;
-
-                filteredRecipeArray.push(...filteredRecipes);
-
-                filteredRecipeArray.forEach(filteredRecipe => {
-                    tagArray.add(filteredRecipe);
-                });
-            }
-        }
-
-        else if (ustensileValueInput.length < 3) {
-
-
-            const filtreListsitems = document.querySelectorAll(".btn_item_list span");
-            filtreListsitems.forEach(item => {
-                item.remove();
-            })
-            ingredientSet.clear()
-            applianceSet.clear()
-            ustensileSet.clear()
-
-            recipeArray.forEach(recipe => {
-                recipe.ingredients.forEach(ingredient => {
-
-                    ingredientSet.add(ingredient.ingredient);
-
-                });
-
-                recipe.ustensils.forEach(ustensil => {
-                    ustensileSet.add(ustensil);
-                });
-                ;
-                applianceSet.add(recipe.appliance);
-
-            })
-            ingredientSet.forEach(ingredient => {
-                const filtreIngredient = document.createElement("span");
-                filtreIngredient.innerText = `${ingredient}`;
-                filtreIngredient.classList.add("filtre_list_item");
-                filtreIngredient.setAttribute("data-value", `${ingredient}`);
-                listIngredientsFiltre.appendChild(filtreIngredient);
-            });
-
-            applianceSet.forEach(appliance => {
-                const filtreAppliance = document.createElement("span");
-                filtreAppliance.innerText = `${appliance}`;
-                filtreAppliance.classList.add("filtre_list_item");
-                filtreAppliance.setAttribute("data-value", `${appliance}`);
-                listApplianceFiltre.appendChild(filtreAppliance);
-            });
-
-            ustensileSet.forEach(ustensile => {
-                const filtreUstensile = document.createElement("span");
-                filtreUstensile.innerText = `${ustensile}`;
-                filtreUstensile.classList.add("filtre_list_item");
-                filtreUstensile.setAttribute("data-value", `${ustensile}`);
-                listUstensileFiltre.appendChild(filtreUstensile);
-            });
-        }
-    }
-    )
-
-/**********************Champs de recherche Avancée Appliance *************************************************** */
-
-applianceInput.addEventListener("input", () => {
-
-    let applianceValueInput = applianceInput.value;
-    if (applianceValueInput.length > 2) {
-        const filteredRecipes = recipeArray.filter(recipe =>
-            recipe.appliance.toLowerCase().includes(applianceValueInput))
-
-        const filtreListsitems = document.querySelectorAll(".btn_item_list span");
-        filtreListsitems.forEach(item => {
-            item.remove();
-        })
-        ingredientSet.clear()
-        applianceSet.clear()
-        ustensileSet.clear()
-
-        filteredRecipes.forEach(filteredRecipe => {
-            filteredRecipe.ingredients.forEach(ingredient => {
-                
-                    ingredientSet.add(ingredient.ingredient);
-                
-            });
-
-            filteredRecipe.ustensils.forEach(ustensil => {
-                
-                ustensileSet.add(ustensil);
-                
-            });
-            ;
-            if (filteredRecipe.appliance.toLowerCase().includes(applianceValueInput)) {
-            applianceSet.add(filteredRecipe.appliance);
-            }
-        })
-        ingredientSet.forEach(ingredient => {
-            const filtreIngredient = document.createElement("span");
-            filtreIngredient.innerText = `${ingredient}`;
-            filtreIngredient.classList.add("filtre_list_item");
-            filtreIngredient.setAttribute("data-value", `${ingredient}`);
-            listIngredientsFiltre.appendChild(filtreIngredient);
-        });
-
-        applianceSet.forEach(appliance => {
-            const filtreAppliance = document.createElement("span");
-            filtreAppliance.innerText = `${appliance}`;
-            filtreAppliance.classList.add("filtre_list_item");
-            filtreAppliance.setAttribute("data-value", `${appliance}`);
-            listApplianceFiltre.appendChild(filtreAppliance);
-        });
-
-        ustensileSet.forEach(ustensile => {
-            const filtreUstensile = document.createElement("span");
-            filtreUstensile.innerText = `${ustensile}`;
-            filtreUstensile.classList.add("filtre_list_item");
-            filtreUstensile.setAttribute("data-value", `${ustensile}`);
-            listUstensileFiltre.appendChild(filtreUstensile);
-        });
-
-        /*******************************Gestion des filtres par tag******************************************* */
-
-        if (filtreSectionDOM.children.length === 1) {
-            const filteredRecipes = recipeArray.filter(recipe =>
-                recipe.ingredients.some(ingredient =>
-                    ingredient.ingredient === value) ||
-                recipe.ustensils.some(ustensil => ustensil === value) ||
-                recipe.appliance === value);
-            filteredRecipeArray.push(...filteredRecipes);
-
-            filteredRecipeArray.forEach(filteredRecipe => {
-                tagArray.add(filteredRecipe);
-            });
-            nbeRecettes = 0;
-            galerie.innerHTML = "";
-        }
-
-        else if (filtreSectionDOM.children.length > 1) {
-
-            Array.from(filtreSectionDOM.children).forEach(element => {
-                const value = element.getAttribute("data-value");
-                activeFilters.push(value);
-            })
-
-            const filteredRecipes = recipeArray.filter(recipe =>
-                activeFilters.every(filterValue =>
-                    recipe.ingredients.some(ingredient => ingredient.ingredient === filterValue) ||
-                    recipe.ustensils.some(ustensil => ustensil === filterValue) ||
-                    recipe.appliance === filterValue
-                ));
-            filteredRecipeArray.length = 0;
-
-            filteredRecipeArray.push(...filteredRecipes);
-
-            filteredRecipeArray.forEach(filteredRecipe => {
-                tagArray.add(filteredRecipe);
-            });
-        }
-    }
-
-    else if (applianceValueInput.length < 3) {
-
-
-        const filtreListsitems = document.querySelectorAll(".btn_item_list span");
-        filtreListsitems.forEach(item => {
-            item.remove();
-        })
-        ingredientSet.clear()
-        applianceSet.clear()
-        ustensileSet.clear()
-
-        recipeArray.forEach(recipe => {
-            recipe.ingredients.forEach(ingredient => {
-
-                ingredientSet.add(ingredient.ingredient);
-
-            });
-
-            recipe.ustensils.forEach(ustensil => {
-                ustensileSet.add(ustensil);
-            });
-            ;
-            applianceSet.add(recipe.appliance);
-
-        })
-        ingredientSet.forEach(ingredient => {
-            const filtreIngredient = document.createElement("span");
-            filtreIngredient.innerText = `${ingredient}`;
-            filtreIngredient.classList.add("filtre_list_item");
-            filtreIngredient.setAttribute("data-value", `${ingredient}`);
-            listIngredientsFiltre.appendChild(filtreIngredient);
-        });
-
-        applianceSet.forEach(appliance => {
-            const filtreAppliance = document.createElement("span");
-            filtreAppliance.innerText = `${appliance}`;
-            filtreAppliance.classList.add("filtre_list_item");
-            filtreAppliance.setAttribute("data-value", `${appliance}`);
-            listApplianceFiltre.appendChild(filtreAppliance);
-        });
-
-        ustensileSet.forEach(ustensile => {
-            const filtreUstensile = document.createElement("span");
-            filtreUstensile.innerText = `${ustensile}`;
-            filtreUstensile.classList.add("filtre_list_item");
-            filtreUstensile.setAttribute("data-value", `${ustensile}`);
-            listUstensileFiltre.appendChild(filtreUstensile);
-        });
-    }
+        advancedFilter(valueUstensilsClear, ustensilInput)
+    })
 }
 )
-
-})

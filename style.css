@@ -120,7 +120,7 @@ main {
 .btn_item_list input {
     border: 1px solid #C6C6C6;
     width: 80%;
-    margin: auto;
+    margin: 5px auto;
     min-height: 25px;
     font-family: "Manrope";
     padding: 0px 10px;
@@ -132,7 +132,7 @@ main {
     color: #C6C6C6;
     position: absolute;
     right: 15px;
-    top: 5px;
+    top: 11px;
     width: 5px;
     height: fit-content;
 }
@@ -141,6 +141,25 @@ main {
 #btn_appliance_list[aria-expanded="false"],
 #btn_ustensile_list[aria-expanded="false"] {
     display: none;
+}
+
+#btn_ingredients,
+#btn_appliances,
+#btn_ustensils {
+    position: relative;
+}
+
+#btn_ingredients .fa-xmark,
+#btn_appliances .fa-xmark,
+#btn_ustensils .fa-xmark {
+    display: none;
+    position: absolute;
+    top: 49px;
+    bottom: 0px;
+    z-index: 30;
+    right: 35px;
+    color: #C6C6C6;
+    cursor: pointer;
 }
 
 .filtre_list_item {
