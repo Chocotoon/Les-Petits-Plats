@@ -41,6 +41,16 @@ header {
     color: #7A7A7A;
 }
 
+header .fa-xmark {
+    position: absolute;
+    right: 300px;
+    bottom: 235px;
+    font-size: 25px;
+    color: #C6C6C6;
+    display: none;
+    cursor: pointer;
+}
+
 #search_btn {
     background-color: black;
     color: white;
@@ -209,6 +219,8 @@ main {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    padding-bottom: 80px;
+    font-family: "Manrope";
 }
 
 .recipe_card {
