@@ -128,8 +128,8 @@ async function getRecipeData() {
     return recipes;
 }
 
-function setRecipeNumber(recipes) {
-    nbeRecettes = recipes.length;
+function setRecipeNumber(array) {
+    nbeRecettes = array.length;
     totalRecipe.innerText = `${nbeRecettes} recettes`;
 }
 
@@ -568,9 +568,9 @@ getRecipeData().then(recipes => {
         let filteredRecipes = [];
         if (mainInputValue.length > 2) {
             recipeArray.length = 0;
-            recipes.forEach(recipe => {
-                recipeArray.push(recipe)
-            })
+            for (i = 0; i < recipes.length; i++) {
+                recipeArray.push(recipes[i])
+            }
             filteredRecipes.length = 0;
             mainSearchClear.style.display = "block";
             mainSearchClear.addEventListener("click", () => {
@@ -579,29 +579,33 @@ getRecipeData().then(recipes => {
                 mainInputValue = "";
                 galerie.innerHTML = "";
                 recipeArray.length = 0;
-                recipes.forEach(recipeData => {
-                    constructRecipe(recipeData);
-                    recipeArray.push(recipeData)
-                    recipeData.ingredients.forEach(ingredient => {
-                        ingredientSet.add(ingredient.ingredient);
-                    });
-                    recipeData.ustensils.forEach(ustensil => {
-                        ustensileSet.add(ustensil);
-                    });
-                    applianceSet.add(recipeData.appliance);
-                });
+                for (i = 0; i < recipes.length; i++) {
+                    recipeArray.push(recipes[i])
+                    constructRecipe(recipes[i])
+                    for (index = 0; index < recipes[i].ingredients.length; index++) {
+                        ingredientSet.add(recipes[i].ingredients[index])
+                    }
+                    for (index = 0; index < recipes[i].ustensils.length; index++) {
+                        ustensileSet.add(recipes[i].ustensils[index])
+                    }
+                    applianceSet.add(recipes[i].appliance)
+                }
                 setRecipeNumber(recipes);
                 constructFilterLists(ingredientSet, applianceSet, ustensileSet);
-                Array.from(filtreSectionDOM.children).forEach(item => {
-                    item.remove();
-                })
+                let children = Array.from(filtreSectionDOM.children)
+                for (i = 0; i < children.length; i++) {
+                    children[i].remove()
+                }
             })
 
-            filteredRecipes = recipeArray.filter(recipe =>
-                recipe.ingredients.some(ingredient => ingredient.ingredient.includes(mainInputValue)) ||
-                recipe.name.includes(mainInputValue) ||
-                recipe.description.includes(mainInputValue)
-            );
+            for (let i of recipeArray) {
+                if (i.ingredients.includes(mainInputValue) ||
+                    i.name.includes(mainInputValue) ||
+                    i.description.includes(mainInputValue)) {
+                        filteredRecipes.push(i)
+                    }
+                }
+
             searchBtn.addEventListener("click", () => {
                 if (mainInputValue != "") {
                     activeFilters.length = 0;
@@ -609,16 +613,16 @@ getRecipeData().then(recipes => {
                     galerie.innerHTML = "";
                     clearFilterListsDOM();
                     clearFilters()
-                    filteredRecipes.forEach(filteredRecipe => {
-                        constructRecipe(filteredRecipe)
-                        filteredRecipe.ingredients.forEach(ingredient => {
-                            ingredientSet.add(ingredient.ingredient);
-                        });
-                        filteredRecipe.ustensils.forEach(ustensil => {
-                            ustensileSet.add(ustensil);
-                        });
-                        applianceSet.add(filteredRecipe.appliance);
-                    });
+                    for(let i = 0; i < filteredRecipes.length; i++) {
+                        constructRecipe(filteredRecipes[i])
+                        for(let index = 0; index < filteredRecipes[i].ingredients.length; index ++) {
+                            ingredientSet.add(filteredRecipes[i].ingredients[index].ingredient)
+                        }
+                        for (let index = 0; index < filteredRecipes[i].ustensils.length; index++) {
+                            ustensileSet.add(filteredRecipes[i].ustensils[index])
+                        }
+                        applianceSet.add(filteredRecipes[i].appliance)                        
+                    }
                     setRecipeNumber(filteredRecipes);
                     constructFilterLists(ingredientSet, applianceSet, ustensileSet);
                     if (filteredRecipes.length === 0) {
