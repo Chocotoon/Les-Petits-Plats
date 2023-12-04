@@ -583,7 +583,7 @@ getRecipeData().then(recipes => {
                     recipeArray.push(recipes[i])
                     constructRecipe(recipes[i])
                     for (index = 0; index < recipes[i].ingredients.length; index++) {
-                        ingredientSet.add(recipes[i].ingredients[index])
+                        ingredientSet.add(recipes[i].ingredients[index].ingredient)
                     }
                     for (index = 0; index < recipes[i].ustensils.length; index++) {
                         ustensileSet.add(recipes[i].ustensils[index])
