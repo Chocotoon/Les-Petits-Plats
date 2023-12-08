@@ -100,7 +100,7 @@ main {
     font-size: 16px;
 }
 
-#filtres_btns {
+#filtres_btns_container {
     display: flex;
     justify-content: space-between;
     width: 700px;
